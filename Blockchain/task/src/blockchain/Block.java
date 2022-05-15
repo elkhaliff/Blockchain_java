@@ -1,11 +1,12 @@
 package blockchain;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Block {
+public class Block implements Serializable {
     private final Integer id;
-    private final int zerroCnt;
+    private final int countZero;
     private final Long timeStamp;
     private Long timeStampEnd;
     private Long magicNumber;
@@ -13,9 +14,9 @@ public class Block {
 
     private String currHash;
 
-    public Block(int id, int zerroCnt, String prevHash) {
+    public Block(int id, int countZero, String prevHash) {
         this.id = id;
-        this.zerroCnt = zerroCnt;
+        this.countZero = countZero;
         this.prevHash = prevHash;
         magicNumber = 0L;
         timeStamp = new Date().getTime();
@@ -26,12 +27,12 @@ public class Block {
         return  ThreadLocalRandom.current().nextLong(Long.MAX_VALUE);
     }
     public String getNewHash() {
-        String prefix = new String(new char[zerroCnt]).replace('\0', '0');
+        String prefix = new String(new char[countZero]).replace('\0', '0');
         do {
             magicNumber = generateNumber();
-            String fullField = id.toString() + magicNumber.toString() + timeStamp.toString() + prevHash;
+            String fullField = id.toString() + magicNumber + timeStamp.toString() + prevHash;
             currHash = StringUtil.applySha256(fullField);
-        } while (!currHash.substring(0, zerroCnt).equals(prefix));
+        } while (!currHash.substring(0, countZero).equals(prefix));
         timeStampEnd = new Date().getTime();
         return currHash;
     }
@@ -47,5 +48,9 @@ public class Block {
                 "Hash of the block:\n" +
                 String.format("%s\n", currHash) +
                 String.format("Block was generating for %d seconds\n", timeStampEnd - timeStamp);
+    }
+
+    public String getCurrHash() {
+        return currHash;
     }
 }
