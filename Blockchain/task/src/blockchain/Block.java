@@ -8,19 +8,19 @@ public class Block implements Serializable {
     private final Integer id;
     private final int countZero;
     private final Long timeStamp;
-    private Long timeStampEnd;
+    private long workedSeconds;
     private Long magicNumber;
     private final String prevHash;
 
     private String currHash;
 
-    public Block(int id, int countZero, String prevHash) {
-        this.id = id;
+    public Block(Integer prevId, String prevHash, int countZero) {
+        this.id = prevId == null ? 0 : prevId + 1;
         this.countZero = countZero;
         this.prevHash = prevHash;
         magicNumber = 0L;
         timeStamp = new Date().getTime();
-        timeStampEnd = 0L;
+        workedSeconds = 0L;
     }
 
     private long generateNumber() {
@@ -33,7 +33,8 @@ public class Block implements Serializable {
             String fullField = id.toString() + magicNumber + timeStamp.toString() + prevHash;
             currHash = StringUtil.applySha256(fullField);
         } while (!currHash.substring(0, countZero).equals(prefix));
-        timeStampEnd = new Date().getTime();
+        var timeStampEnd = new Date().getTime();
+        workedSeconds = (timeStampEnd - timeStamp) / 1000;
         return currHash;
     }
 
@@ -47,10 +48,22 @@ public class Block implements Serializable {
                 String.format("%s\n", prevHash) +
                 "Hash of the block:\n" +
                 String.format("%s\n", currHash) +
-                String.format("Block was generating for %d seconds\n", timeStampEnd - timeStamp);
+                String.format("Block was generating for %d seconds\n", workedSeconds);
     }
 
     public String getCurrHash() {
         return currHash;
+    }
+
+    public long getWorkedSeconds() {
+        return workedSeconds;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getPrevHash() {
+        return prevHash;
     }
 }

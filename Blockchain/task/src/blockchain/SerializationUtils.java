@@ -12,7 +12,7 @@ public class SerializationUtils {
     }
 
     public static Object deserialize(String fileName) throws IOException, ClassNotFoundException {
-        Object obj = null;
+        Object obj;
         try (
             FileInputStream fis = new FileInputStream(fileName);
             BufferedInputStream bis = new BufferedInputStream(fis);

@@ -37,14 +37,22 @@ public class Blockchain implements Serializable {
         return new Blockchain();
     }
 
+    public Block getLastBlock() {
+        return chain.peekLast();
+    }
+
+    public Deque<Block> getChain() {
+        return chain;
+    }
+
     public boolean verify() {
         return true;
     }
 
     public synchronized void nextBlock(Block block, boolean check) {
         if (block == null
-                || !block.getCurrHash().startsWith(StringUtils.repeat("0", hashZeros))
-                || !block.getPreviousHash().equals(chain.peekLast() != null ? chain.peekLast().getCurrHash() : "0")
+                || !block.getCurrHash().startsWith(StringUtil.repeat('0', countZero))
+                || !block.getPrevHash().equals(chain.peekLast() != null ? chain.peekLast().getCurrHash() : "0")
                 || !block.getBlockData().isEmpty()
         ) {
             return;
@@ -56,20 +64,20 @@ public class Blockchain implements Serializable {
         }
 
         int hashZerosDelta = 0;
-        if (block.getElapsedSeconds() < 10L) {
-            hashZeros++;
+        if (block.getWorkedSeconds() < 10L) {
+            countZero++;
             hashZerosDelta++;
-        } else if (block.getElapsedSeconds() > 20L) {
-            hashZeros--;
+        } else if (block.getWorkedSeconds() > 20L) {
+            countZero--;
             hashZerosDelta--;
         }
 
         if (check) {
             System.out.print(block.toString());
             if (hashZerosDelta > 0) {
-                System.out.printf("N was increased to %d\n\n", hashZeros);
+                System.out.printf("N was increased to %d\n\n", countZero);
             } else if (hashZerosDelta < 0) {
-                System.out.printf("N was decreased to %d\n\n", hashZeros);
+                System.out.printf("N was decreased to %d\n\n", countZero);
             } else {
                 System.out.print("N stays the same\n\n");
             }
@@ -77,5 +85,9 @@ public class Blockchain implements Serializable {
 
         chain.addLast(block);
         saveData();
+    }
+
+    public int getCountZero() {
+        return countZero;
     }
 }

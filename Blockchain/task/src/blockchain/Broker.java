@@ -17,24 +17,26 @@ public class Broker {
         this.blockchain = blockchain;
     }
 
-    private final List<Callable<Void>> workers = IntStream.range(0, Runtime.getRuntime().availableProcessors())
+    private final List<Callable<Void>> miners = IntStream.range(0, Runtime.getRuntime().availableProcessors())
             .mapToObj(ignored -> new Callable<Void>() {
                 @Override
                 public Void call() {
+                    Block block = blockchain.getLastBlock();
                     blockchain.nextBlock(
-                            new Block(blockchain.getLastBlock(), blockchain.getHashZeros()), true);
+                            new Block(block.getId(), block.getPrevHash(), blockchain.getCountZero()), true);
                     return null;
                 }
             })
             .collect(Collectors.toList());
+
     void generateBlock() {
         try {
-            // it's invokeAll, but I don't want my processor to suffocate
-            execPool.invokeAny(workers);
+            execPool.invokeAny(miners);
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
     }
+
     void shutdown() {
         execPool.shutdownNow();
     }

@@ -4,6 +4,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 public class StringUtil {
+    public static String repeat(char ch, int count) {
+        return new String(new char[count]).replace('\0', ch);
+        //return count > 0 ? str + repeat(str, count - 1) : "";
+    }
+
     /* Applies Sha256 to a string and returns a hash. */
     public static String applySha256(String input){
         try {
