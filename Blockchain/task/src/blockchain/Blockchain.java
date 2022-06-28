@@ -31,7 +31,7 @@ public class Blockchain implements Serializable {
                     return bc;
                 }
             } catch (IOException | ClassNotFoundException ignored) {
-                System.out.println("Data file is malformed. Creating a new blockchain.");
+                System.out.println("No data.");
             }
         }
         return new Blockchain();
@@ -53,30 +53,29 @@ public class Blockchain implements Serializable {
         if (block == null
                 || !block.getCurrHash().startsWith(StringUtil.repeat('0', countZero))
                 || !block.getPrevHash().equals(chain.peekLast() != null ? chain.peekLast().getCurrHash() : "0")
-                || !block.getBlockData().isEmpty()
+                // || !block.getBlockData().isEmpty()
         ) {
             return;
         }
 
-        boolean dataAccepted = block.acceptData(serviceData);
-        if (dataAccepted) {
+        /* if (block.acceptData(serviceData)) {
             serviceData.clear();
-        }
+        }*/
 
-        int hashZerosDelta = 0;
+        int shiftZero = 0;
         if (block.getWorkedSeconds() < 10L) {
             countZero++;
-            hashZerosDelta++;
-        } else if (block.getWorkedSeconds() > 20L) {
+            shiftZero++;
+        } else if (block.getWorkedSeconds() > 15L) {
             countZero--;
-            hashZerosDelta--;
+            shiftZero--;
         }
 
         if (check) {
-            System.out.print(block.toString());
-            if (hashZerosDelta > 0) {
+            System.out.print(block);
+            if (shiftZero > 0) {
                 System.out.printf("N was increased to %d\n\n", countZero);
-            } else if (hashZerosDelta < 0) {
+            } else if (shiftZero < 0) {
                 System.out.printf("N was decreased to %d\n\n", countZero);
             } else {
                 System.out.print("N stays the same\n\n");
