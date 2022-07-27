@@ -10,6 +10,7 @@ public class Blockchain implements Serializable {
     private int countZero = 0;
     private final Deque<Block> chain = new LinkedList<>();
     public static final String SERIAL_FILE_NAME = "data.dat";
+    private int currentCount;
 
     public Blockchain() {
     }
@@ -31,7 +32,6 @@ public class Blockchain implements Serializable {
                     return bc;
                 }
             } catch (IOException | ClassNotFoundException ignored) {
-                System.out.println("No data.");
             }
         }
         return new Blockchain();
@@ -52,8 +52,8 @@ public class Blockchain implements Serializable {
     public synchronized void nextBlock(Block block, boolean check) {
         if (block == null
                 || !block.getCurrHash().startsWith(StringUtil.repeat('0', countZero))
-                || !block.getPrevHash().equals(chain.peekLast() != null ? chain.peekLast().getCurrHash() : "0")
-                // || !block.getBlockData().isEmpty()
+                || !block.getPrevHash().equals(getLastBlock() != null ? getLastBlock().getCurrHash() : "0")
+                || !block.getBlockData().isEmpty()
         ) {
             return;
         }
@@ -63,12 +63,12 @@ public class Blockchain implements Serializable {
         }*/
 
         int shiftZero = 0;
-        if (block.getWorkedSeconds() < 10L) {
-            countZero++;
-            shiftZero++;
-        } else if (block.getWorkedSeconds() > 15L) {
+        if (block.getWorkedSeconds() > 5L) {
             countZero--;
             shiftZero--;
+        } else if (block.getWorkedSeconds() < 3L) {
+            countZero++;
+            shiftZero++;
         }
 
         if (check) {
@@ -82,6 +82,7 @@ public class Blockchain implements Serializable {
             }
         }
 
+        currentCount++;
         chain.addLast(block);
         saveData();
     }
@@ -89,4 +90,8 @@ public class Blockchain implements Serializable {
     public int getCountZero() {
         return countZero;
     }
+
+    public int getCurrentCount() { return currentCount; }
+
+    public void setCurrentCount(int i) { currentCount = 0; }
 }

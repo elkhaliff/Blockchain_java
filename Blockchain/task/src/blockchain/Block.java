@@ -40,7 +40,7 @@ public class Block implements Serializable {
             currHash = StringUtil.applySha256(fullField);
         } while (!currHash.substring(0, countZero).equals(prefix));
         var timeStampEnd = new Date().getTime();
-        workedSeconds = (timeStampEnd - timeStamp) / 1000;
+        workedSeconds = (timeStampEnd - timeStamp) / 100;
     }
 
     public Map<String, List<HashMap<String, String>>> getBlockData() {

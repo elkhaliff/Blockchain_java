@@ -29,11 +29,13 @@ public class Miner {
             })
             .collect(Collectors.toList());
 
-    void generateBlock() {
+    public boolean generateBlock() {
         try {
             execPool.invokeAny(miners);
+            return blockchain.getCurrentCount() < 5;
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
